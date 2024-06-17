@@ -24,13 +24,7 @@ public class JwtAuthenticationConverter implements AuthenticationConverter {
     @Override
     public Authentication convert(HttpServletRequest request)  {
 
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);echo "# mcs-product-service" >> README.md
-        git init
-        git add README.md
-        git commit -m "first commit"
-        git branch -M main
-        git remote add origin git@github.com:evgVira/mcs-product-service.git
-        git push -u origin main
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header != null && header.startsWith("Bearer ")) {
             String requestToken = header.replace("Bearer ", "");
