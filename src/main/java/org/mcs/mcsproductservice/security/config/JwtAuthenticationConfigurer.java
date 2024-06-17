@@ -4,7 +4,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mcs.mcsproductservice.security.JwtAuthenticationConverter;
-import org.mcs.mcsproductservice.security.RequestJwtTokenFilter;
+import org.mcs.mcsproductservice.security.JwtLogoutTokenFilter;
+import org.mcs.mcsproductservice.security.JwtRefreshTokenFilter;
 import org.mcs.mcsproductservice.security.UserEntityService;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,17 +24,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtAuthenticationConfigurer extends AbstractHttpConfigurer<JwtAuthenticationConfigurer, HttpSecurity> {
 
-    private final RequestJwtTokenFilter requestJwtTokenFilter;
-
     private final UserEntityService userEntityService;
 
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
+
+    private final JwtRefreshTokenFilter jwtRefreshTokenFilter;
+
+    private final JwtLogoutTokenFilter jwtLogoutTokenFilter;
 
     @Override
     public void init(HttpSecurity builder) throws Exception {
         CsrfConfigurer csrfConfigurer = builder.getConfigurer(CsrfConfigurer.class);
         if (csrfConfigurer != null) {
-            csrfConfigurer.ignoringRequestMatchers(new AntPathRequestMatcher("/token", HttpMethod.POST.name()));
+            csrfConfigurer.ignoringRequestMatchers(new AntPathRequestMatcher("/token/**", HttpMethod.POST.name()));
         }
     }
 
@@ -52,8 +55,9 @@ public class JwtAuthenticationConfigurer extends AbstractHttpConfigurer<JwtAuthe
         authenticationProvider.setPreAuthenticatedUserDetailsService(userEntityService);
 
         builder
-                .addFilterAfter(requestJwtTokenFilter, ExceptionTranslationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, CsrfFilter.class)
+                .addFilterBefore(jwtRefreshTokenFilter, ExceptionTranslationFilter.class)
+                .addFilterAfter(jwtLogoutTokenFilter, ExceptionTranslationFilter.class)
                 .authenticationProvider(authenticationProvider);
     }
 }
