@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5434/mcs_product_db
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+jwt:
+  access-secret: 'access-secret-key'
+  refresh-secret: 'refresh-secret-key'
+
+server:
+  port: 8081
